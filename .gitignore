@@ -1,0 +1,4 @@
+datasets/**/*.csv
+logs/*.log
+dockerfiles
+.idea

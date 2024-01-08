@@ -1,0 +1,26 @@
+# Common
+logLevel: "info"
+environment: "dev"
+
+# HTTP server configuration
+api:
+  ip: "localhost"
+  port: 8000
+  host: "http://localhost:8000"
+
+# Database configuration
+postgres:
+  username: "postgres"
+  password: "postgres"
+  host: "localhost"
+  port: 5432
+  database: "postgres"
+
+# JWT authentication configuration
+auth:
+  access:
+    lifetime: 600 # in seconds
+    secret: "access-secret"
+  refresh:
+    lifetime: 31536000 # in seconds
+    secret: "refresh-secret"

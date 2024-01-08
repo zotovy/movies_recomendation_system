@@ -1,0 +1,17 @@
+info:
+  contact: {}
+paths:
+  /metrics/ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: ping
+      tags:
+      - metrics
+swagger: "2.0"
