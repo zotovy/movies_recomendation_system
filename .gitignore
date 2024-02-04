@@ -1,4 +1,6 @@
-datasets/**/*.csv
+datasets/movies-dataset/*.csv
+datasets/tmdb-dataset/*.csv
 logs/*.log
 dockerfiles
 .idea
+.DS_Store
