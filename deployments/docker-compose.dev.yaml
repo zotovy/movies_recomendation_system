@@ -11,6 +11,8 @@ services:
       - DATABASE_HOST=localhost
     volumes:
       - ../dockerfiles:/var/lib/postgresql/data
+      - ../datasets/own-dataset:/var/datasets
+      - ../scripts/sql:/var/scripts/sql
     ports:
       - '5432:5432'
 

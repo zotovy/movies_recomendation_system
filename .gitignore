@@ -4,3 +4,4 @@ logs/*.log
 dockerfiles
 .idea
 .DS_Store
+.ipynb_checkpoints
