@@ -3,6 +3,7 @@ ALTER TABLE movies
     ADD COLUMN IF NOT EXISTS document tsvector;
 
 -- Compute tsvector for each movie
+-- noinspection SqlWithoutWhere
 UPDATE movies
 SET document = setweight(to_tsvector(title), 'A') ||
                setweight(to_tsvector(overview), 'C') ||

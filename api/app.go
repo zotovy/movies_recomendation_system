@@ -3,6 +3,7 @@ package app
 import (
 	"app/feats/docs"
 	"app/feats/metrics"
+	"app/feats/search"
 	"app/pkg"
 	"app/pkg/config"
 	"app/pkg/logger"
@@ -28,6 +29,7 @@ func NewApp() *fx.App {
 		// Feats
 		metrics.Context,
 		docs.Context,
+		search.Context,
 
 		// Lifecycle
 		fx.Invoke(registerHooks),

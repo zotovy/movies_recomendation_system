@@ -1,3 +1,16 @@
+definitions:
+  models.MoviePreview:
+    properties:
+      id:
+        example: 123
+        type: integer
+      overview:
+        example: A paraplegic Marine is dispatched to the moon
+        type: string
+      title:
+        example: Avatar
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -14,4 +27,46 @@ paths:
       summary: ping
       tags:
       - metrics
+  /search/movies:
+    get:
+      description: Responds with the list of all books, which satisfies query
+      parameters:
+      - description: query to search
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MoviePreview'
+            type: array
+      summary: Search movies by query
+      tags:
+      - search
+  /search/movies/autocomplete:
+    get:
+      description: Responds with the list of all books, which title satisfies query
+      parameters:
+      - description: query to search
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MoviePreview'
+            type: array
+      summary: Autocomplete movies title
+      tags:
+      - search
 swagger: "2.0"

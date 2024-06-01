@@ -23,6 +23,89 @@
                     }
                 }
             }
+        },
+        "/search/movies": {
+            "get": {
+                "description": "Responds with the list of all books, which satisfies query",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search movies by query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "query to search",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MoviePreview"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/search/movies/autocomplete": {
+            "get": {
+                "description": "Responds with the list of all books, which title satisfies query",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Autocomplete movies title",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "query to search",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MoviePreview"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.MoviePreview": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "overview": {
+                    "type": "string",
+                    "example": "A paraplegic Marine is dispatched to the moon"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Avatar"
+                }
+            }
         }
     }
 }

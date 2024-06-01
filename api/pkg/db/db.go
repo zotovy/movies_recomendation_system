@@ -3,42 +3,70 @@ package db
 import (
 	"app/pkg/config"
 	"app/pkg/logger"
+	"app/pkg/utils"
+	"context"
 	"fmt"
-	"go.uber.org/zap"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"moul.io/zapgorm2"
+	"github.com/jackc/pgx/v5"
+	"log"
+	"time"
 )
 
-type DB = gorm.DB
+type DB = pgx.Conn
 
-func NewDatabase(config *config.Config, logger *logger.Logger) *DB {
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		config.PostgreSQL.Host,
-		config.PostgreSQL.Username,
-		config.PostgreSQL.Password,
-		config.PostgreSQL.Database,
-		config.PostgreSQL.Port,
+func NewDB(cfg *config.Config, logger *logger.Logger) (conn *pgx.Conn, err error) {
+	err = utils.DoWithTries(func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		connStr := fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
+			cfg.PostgreSQL.Host,
+			cfg.PostgreSQL.Username,
+			cfg.PostgreSQL.Password,
+			cfg.PostgreSQL.Database,
+			cfg.PostgreSQL.Port,
+		)
+
+		connConfig, err := pgx.ParseConfig(connStr)
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+
+		connConfig.Tracer = &myQueryTracer{
+			log: logger,
+		}
+
+		conn, err = pgx.ConnectConfig(ctx, connConfig)
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	}, 5, 5*time.Second)
+
+	if err != nil {
+		log.Fatal("error do with tries postgresql")
+	}
+
+	return conn, nil
+}
+
+type myQueryTracer struct {
+	log *logger.Logger
+}
+
+func (tracer *myQueryTracer) TraceQueryStart(
+	ctx context.Context,
+	_ *pgx.Conn,
+	data pgx.TraceQueryStartData) context.Context {
+	tracer.log.Info(
+		fmt.Sprintf("Executing command  %s, %s", data.SQL, data.Args),
 	)
 
-	dbLogger := zapgorm2.New(logger)
+	return ctx
+}
 
-	logger.Info("Connecting to PostgreSQL", zap.String("dsn", dsn))
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: dbLogger})
-
-	if err != nil {
-		logger.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
-		return nil
-	}
-
-	// Migrations
-	//err = db.AutoMigrate(&models.Test{})
-
-	if err != nil {
-		logger.Fatal("Failed to auto migrate database", zap.Error(err))
-		return nil
-	}
-
-	return db
+func (tracer *myQueryTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryEndData) {
 }

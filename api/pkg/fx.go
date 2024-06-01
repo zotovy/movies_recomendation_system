@@ -12,7 +12,7 @@ var Module = fx.Options(
 	fx.Provide(
 		router.GetRouter,
 		config.NewConfig,
-		db.NewDatabase,
+		db.NewDB,
 	),
 	fx.WithLogger(func(logger *zap.Logger) *zap.Logger {
 		return logger.Named("pkg")

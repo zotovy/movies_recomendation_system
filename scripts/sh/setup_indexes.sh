@@ -1,0 +1,1 @@
+psql -U postgres -d postgres -f /var/scripts/sql/setup_indexes.sql
