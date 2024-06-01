@@ -35,9 +35,9 @@ CREATE TABLE IF NOT EXISTS production_companies
     name varchar(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS production_countries
+CREATE TABLE IF NOT EXISTS countries
 (
-    id   INT PRIMARY KEY,
+    code varchar(2) PRIMARY KEY,
     name varchar(255) NOT NULL
 );
 
@@ -58,11 +58,11 @@ CREATE TABLE IF NOT EXISTS "cast"
 
 CREATE TABLE IF NOT EXISTS crew
 (
-    id        INT PRIMARY KEY,
-    character text         NOT NULL,
-    name      varchar(255) NOT NULL,
-    gender    INT          NOT NULL,
-    "order"   INT          NOT NULL
+    id         INT PRIMARY KEY,
+    name       varchar(255) NOT NULL,
+    job        varchar(255) NOT NULL,
+    gender     INT          NOT NULL,
+    department varchar(255) NOT NULL
 );
 
 CREATE TABLE movies_genres
@@ -88,24 +88,16 @@ CREATE TABLE movies_production_companies
 
 CREATE TABLE movies_production_countries
 (
-    movie_id                INTEGER REFERENCES movies (id),
-    production_countries_id INTEGER REFERENCES production_countries (id),
-    CONSTRAINT movies_production_countries_pk PRIMARY KEY (movie_id, production_countries_id)
-);
-
-
-CREATE TABLE movies_original_countries
-(
     movie_id     INTEGER REFERENCES movies (id),
-    languages_id varchar(2) REFERENCES languages (code),
-    CONSTRAINT movies_original_countries_pk PRIMARY KEY (movie_id, languages_id)
+    country_code varchar(2) REFERENCES countries (code),
+    CONSTRAINT movies_production_countries_pk PRIMARY KEY (movie_id, country_code)
 );
 
 CREATE TABLE movies_spoken_languages
 (
-    movie_id     INTEGER REFERENCES movies (id),
-    languages_id varchar(2) REFERENCES languages (code),
-    CONSTRAINT movies_spoken_languages_pk PRIMARY KEY (movie_id, languages_id)
+    movie_id      INTEGER REFERENCES movies (id),
+    language_code varchar(2) REFERENCES languages (code),
+    CONSTRAINT movies_spoken_languages_pk PRIMARY KEY (movie_id, language_code)
 );
 
 CREATE TABLE movies_cast
