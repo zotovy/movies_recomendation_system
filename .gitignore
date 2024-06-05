@@ -1,5 +1,7 @@
 datasets/movies-dataset/*.csv
 datasets/tmdb-dataset/*.csv
+datasets/own-dataset/*.csv
+recomendations_api/static
 logs/*.log
 dockerfiles
 .idea

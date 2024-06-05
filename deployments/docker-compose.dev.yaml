@@ -15,30 +15,13 @@ services:
       - ../scripts/sql:/var/scripts/sql
     ports:
       - '5432:5432'
-
-  elasticsearch:
-    image: elasticsearch:8.11.3
-    container_name: elasticsearch
+  redis:
+    image: redis:latest
+    container_name: redis_movies
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
+      - REDIS_PASSWORD=redis
     ports:
-      - "9200:9200"
-      - "9300:9300"
-    networks:
-      - elastic
-
-  kibana:
-    image: kibana:8.11.3
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_PASSWORD=yourElasticPassword
-      - XPACK_SECURITY_ENABLED=true
-    networks:
-      - elastic
+      - '6379:6379'
 
 networks:
   elastic:

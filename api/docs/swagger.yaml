@@ -1,15 +1,179 @@
 definitions:
-  models.MoviePreview:
+  models.AnonymousMovieRating:
+    properties:
+      movie_id:
+        type: integer
+      rating:
+        type: integer
+    type: object
+  models.CastDTO:
+    properties:
+      character:
+        example: Captain Jack Sparrow
+        type: string
+      gender:
+        example: male
+        type: string
+      id:
+        example: 123
+        type: integer
+      name:
+        example: Johnny Depp
+        type: string
+    type: object
+  models.Company:
     properties:
       id:
         example: 123
         type: integer
+      name:
+        example: Warner Brothers
+        type: string
+    type: object
+  models.Country:
+    properties:
+      code:
+        example: UK
+        type: string
+      name:
+        example: United Kingdom
+        type: string
+    type: object
+  models.CrewDTO:
+    properties:
+      department:
+        example: Videography
+        type: string
+      gender:
+        example: Male
+        type: string
+      id:
+        example: 123
+        type: integer
+      job:
+        example: Camera man
+        type: string
+      name:
+        example: Johnny Depp
+        type: string
+    type: object
+  models.Genre:
+    properties:
+      id:
+        example: 123
+        type: integer
+      name:
+        example: horror
+        type: string
+    type: object
+  models.Keyword:
+    properties:
+      id:
+        example: 123
+        type: integer
+      name:
+        example: science
+        type: string
+    type: object
+  models.Language:
+    properties:
+      code:
+        example: EN
+        type: string
+      name:
+        example: English
+        type: string
+    type: object
+  models.MovieDTO:
+    properties:
+      budget:
+        example: 10000
+        type: integer
+      cast:
+        items:
+          $ref: '#/definitions/models.CastDTO'
+        type: array
+      countries:
+        items:
+          $ref: '#/definitions/models.Country'
+        type: array
+      crew:
+        items:
+          $ref: '#/definitions/models.CrewDTO'
+        type: array
+      genres:
+        items:
+          $ref: '#/definitions/models.Genre'
+        type: array
+      homepage:
+        example: http://www.sinistermovie.com/
+        type: string
+      id:
+        example: 123
+        type: integer
+      keywords:
+        items:
+          $ref: '#/definitions/models.Keyword'
+        type: array
+      languages:
+        items:
+          $ref: '#/definitions/models.Language'
+        type: array
+      originalLanguage:
+        example: English
+        type: string
+      originalTitle:
+        example: Avatar
+        type: string
       overview:
+        example: A paraplegic Marine is dispatched to the moon
+        type: string
+      popularity:
+        example: 321.52
+        type: number
+      productionCompanies:
+        items:
+          $ref: '#/definitions/models.Company'
+        type: array
+      releaseDate:
+        example: "2006-10-06"
+        type: string
+      revenue:
+        example: 14821658
+        type: integer
+      runtime:
+        example: 123
+        type: number
+      status:
+        example: Released
+        type: string
+      tagline:
         example: A paraplegic Marine is dispatched to the moon
         type: string
       title:
         example: Avatar
         type: string
+      voteAverage:
+        example: 7.8
+        type: number
+      voteCount:
+        example: 32132
+        type: integer
+    type: object
+  models.MoviePreview:
+    properties:
+      id:
+        example: 123
+        type: integer
+      tagline:
+        example: A paraplegic Marine is dispatched to the moon
+        type: string
+      title:
+        example: Avatar
+        type: string
+      voteAverage:
+        example: 7.8
+        type: number
     type: object
 info:
   contact: {}
@@ -27,6 +191,52 @@ paths:
       summary: ping
       tags:
       - metrics
+  /movies/{id}:
+    get:
+      description: Responds with the movie
+      parameters:
+      - description: movie id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MovieDTO'
+      summary: Get movie by its id
+      tags:
+      - movie
+  /recommendations/movies:
+    post:
+      consumes:
+      - application/json
+      description: Responds with the list of movies, which is the best recommendations
+        for given user
+      parameters:
+      - description: user ratings
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.AnonymousMovieRating'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MoviePreview'
+            type: array
+      summary: Get movies recommendations
+      tags:
+      - recommendations
   /search/movies:
     get:
       description: Responds with the list of all books, which satisfies query
@@ -50,7 +260,7 @@ paths:
       - search
   /search/movies/autocomplete:
     get:
-      description: Responds with the list of all books, which title satisfies query
+      description: Responds with the list of all movies, which title satisfies query
       parameters:
       - description: query to search
         in: query

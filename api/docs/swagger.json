@@ -24,6 +24,75 @@
                 }
             }
         },
+        "/movies/{id}": {
+            "get": {
+                "description": "Responds with the movie",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movie"
+                ],
+                "summary": "Get movie by its id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "movie id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.MovieDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/recommendations/movies": {
+            "post": {
+                "description": "Responds with the list of movies, which is the best recommendations for given user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recommendations"
+                ],
+                "summary": "Get movies recommendations",
+                "parameters": [
+                    {
+                        "description": "user ratings",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AnonymousMovieRating"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MoviePreview"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/search/movies": {
             "get": {
                 "description": "Responds with the list of all books, which satisfies query",
@@ -58,7 +127,7 @@
         },
         "/search/movies/autocomplete": {
             "get": {
-                "description": "Responds with the list of all books, which title satisfies query",
+                "description": "Responds with the list of all movies, which title satisfies query",
                 "produces": [
                     "application/json"
                 ],
@@ -90,6 +159,235 @@
         }
     },
     "definitions": {
+        "models.AnonymousMovieRating": {
+            "type": "object",
+            "properties": {
+                "movie_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.CastDTO": {
+            "type": "object",
+            "properties": {
+                "character": {
+                    "type": "string",
+                    "example": "Captain Jack Sparrow"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "male"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Johnny Depp"
+                }
+            }
+        },
+        "models.Company": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Warner Brothers"
+                }
+            }
+        },
+        "models.Country": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "UK"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "United Kingdom"
+                }
+            }
+        },
+        "models.CrewDTO": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string",
+                    "example": "Videography"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "Male"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "job": {
+                    "type": "string",
+                    "example": "Camera man"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Johnny Depp"
+                }
+            }
+        },
+        "models.Genre": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "name": {
+                    "type": "string",
+                    "example": "horror"
+                }
+            }
+        },
+        "models.Keyword": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "name": {
+                    "type": "string",
+                    "example": "science"
+                }
+            }
+        },
+        "models.Language": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "EN"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "English"
+                }
+            }
+        },
+        "models.MovieDTO": {
+            "type": "object",
+            "properties": {
+                "budget": {
+                    "type": "integer",
+                    "example": 10000
+                },
+                "cast": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CastDTO"
+                    }
+                },
+                "countries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Country"
+                    }
+                },
+                "crew": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CrewDTO"
+                    }
+                },
+                "genres": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Genre"
+                    }
+                },
+                "homepage": {
+                    "type": "string",
+                    "example": "http://www.sinistermovie.com/"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Keyword"
+                    }
+                },
+                "languages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Language"
+                    }
+                },
+                "originalLanguage": {
+                    "type": "string",
+                    "example": "English"
+                },
+                "originalTitle": {
+                    "type": "string",
+                    "example": "Avatar"
+                },
+                "overview": {
+                    "type": "string",
+                    "example": "A paraplegic Marine is dispatched to the moon"
+                },
+                "popularity": {
+                    "type": "number",
+                    "example": 321.52
+                },
+                "productionCompanies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Company"
+                    }
+                },
+                "releaseDate": {
+                    "type": "string",
+                    "example": "2006-10-06"
+                },
+                "revenue": {
+                    "type": "integer",
+                    "example": 14821658
+                },
+                "runtime": {
+                    "type": "number",
+                    "example": 123
+                },
+                "status": {
+                    "type": "string",
+                    "example": "Released"
+                },
+                "tagline": {
+                    "type": "string",
+                    "example": "A paraplegic Marine is dispatched to the moon"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Avatar"
+                },
+                "voteAverage": {
+                    "type": "number",
+                    "example": 7.8
+                },
+                "voteCount": {
+                    "type": "integer",
+                    "example": 32132
+                }
+            }
+        },
         "models.MoviePreview": {
             "type": "object",
             "properties": {
@@ -97,13 +395,17 @@
                     "type": "integer",
                     "example": 123
                 },
-                "overview": {
+                "tagline": {
                     "type": "string",
                     "example": "A paraplegic Marine is dispatched to the moon"
                 },
                 "title": {
                     "type": "string",
                     "example": "Avatar"
+                },
+                "voteAverage": {
+                    "type": "number",
+                    "example": 7.8
                 }
             }
         }

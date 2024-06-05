@@ -25,6 +25,12 @@ type Config struct {
 		Database string `yaml:"database" env-required:"true"`
 	} `yaml:"postgres"`
 
+	Redis struct {
+		Address  string `yaml:"address" env-required:"true"`
+		Password string `yaml:"password" env-required:"true"`
+		Database int    `yaml:"database"`
+	} `yaml:"redis" env-required:"true"`
+
 	Auth struct {
 		Access struct {
 			Lifetime int64  `yaml:"lifetime" env-required:"true"`
@@ -35,6 +41,12 @@ type Config struct {
 			Secret   string `yaml:"secret" env-required:"true"`
 		} `yaml:"refresh"`
 	} `yaml:"auth" env-required:"true"`
+
+	Services struct {
+		RecommendationsAPI struct {
+			BaseUrl string `yaml:"base-url" env-required:"true"`
+		} `yaml:"recommendations-api"`
+	} `yaml:"services"`
 }
 
 func NewConfig() *Config {

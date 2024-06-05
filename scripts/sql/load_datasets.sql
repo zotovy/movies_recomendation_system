@@ -29,3 +29,5 @@ COPY movies_spoken_languages (movie_id, language_code) FROM '/var/datasets/movie
 COPY movies_cast (movie_id, cast_id) FROM '/var/datasets/movies_cast.csv' DELIMITER ',' CSV HEADER;
 
 COPY movies_crew (movie_id, crew_id) FROM '/var/datasets/movies_crew.csv' DELIMITER ',' CSV HEADER;
+
+COPY ratings (user_id, movie_id, rating) FROM '/var/datasets/ratings.csv' DELIMITER ',' CSV HEADER;

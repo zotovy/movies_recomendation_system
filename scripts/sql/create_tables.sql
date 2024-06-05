@@ -113,3 +113,11 @@ CREATE TABLE movies_crew
     crew_id  INTEGER REFERENCES crew (id),
     CONSTRAINT movies_crew_pk PRIMARY KEY (movie_id, crew_id)
 );
+
+
+CREATE TABLE ratings
+(
+    movie_id INTEGER REFERENCES movies(id),
+    user_id INTEGER,
+    rating FLOAT
+)

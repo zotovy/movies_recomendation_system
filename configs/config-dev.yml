@@ -24,3 +24,14 @@ auth:
   refresh:
     lifetime: 31536000 # in seconds
     secret: "refresh-secret"
+
+# Redis
+redis:
+  address: "localhost:6379"
+  password: "redis"
+  database: 0
+
+# Services
+services:
+  recommendations-api:
+    base-url: "http://localhost:5566"

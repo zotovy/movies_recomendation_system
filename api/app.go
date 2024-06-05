@@ -3,6 +3,8 @@ package app
 import (
 	"app/feats/docs"
 	"app/feats/metrics"
+	"app/feats/movies"
+	"app/feats/recommendations"
 	"app/feats/search"
 	"app/pkg"
 	"app/pkg/config"
@@ -30,6 +32,8 @@ func NewApp() *fx.App {
 		metrics.Context,
 		docs.Context,
 		search.Context,
+		movies.Context,
+		recommendations.Context,
 
 		// Lifecycle
 		fx.Invoke(registerHooks),

@@ -9,7 +9,7 @@ import (
 
 // AutoCompleteMovies godoc
 // @Summary      Autocomplete movies title
-// @Description  Responds with the list of all books, which title satisfies query
+// @Description  Responds with the list of all movies, which title satisfies query
 // @Tags         search
 // @Produce      json
 // @Param        q query string true "query to search"
