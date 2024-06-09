@@ -22,6 +22,16 @@ services:
       - REDIS_PASSWORD=redis
     ports:
       - '6379:6379'
+  recommendations_api:
+    container_name: recommendations_api
+    build:
+      context: ../recomendations_api
+    ports:
+      - '5566:8000'
+    volumes:
+      - ../recomendations_api/static:/app/static
+    environment:
+      - database_host=postgres
 
 networks:
   elastic:

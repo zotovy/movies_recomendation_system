@@ -1,11 +1,4 @@
 definitions:
-  models.AnonymousMovieRating:
-    properties:
-      movie_id:
-        type: integer
-      rating:
-        type: integer
-    type: object
   models.CastDTO:
     properties:
       character:
@@ -217,14 +210,15 @@ paths:
       description: Responds with the list of movies, which is the best recommendations
         for given user
       parameters:
-      - description: user ratings
-        in: body
-        name: request
+      - description: user id
+        in: query
+        name: userId
         required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.AnonymousMovieRating'
-          type: array
+        type: integer
+      - description: query limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:

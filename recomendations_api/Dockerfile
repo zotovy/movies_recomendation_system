@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the local code to the container
 COPY app.py .
 COPY movie_recommender.py .
+COPY database.py .
+COPY settings.py .
 
 # Expose the port the app runs on
 EXPOSE 8000

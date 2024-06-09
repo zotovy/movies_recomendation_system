@@ -4,7 +4,10 @@ from typing import List
 from movie_recommender import movieRecommender
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(
+    title="Recommendation API",
+    description="API to interact with SVD user-movie model"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,23 +18,27 @@ app.add_middleware(
 )
 
 
-class Ratings(BaseModel):
+class MovieRecommendationItem(BaseModel):
     movie_id: int
-    rating: int
+    rating: float
 
 
-def ratings_to_dict(ratings: List[Ratings]):
-    d = dict()
-    for rating in ratings:
-        d[rating.movie_id] = rating.rating
-    return d
+@app.get('/recommend', tags=['ML'], summary='Returns list of movie recommendations for specific user')
+async def recommend(user_id: int, amount: int = 10_000) -> List[MovieRecommendationItem]:
+    data = movieRecommender.recommend(user_id)[:amount]
+    return [
+        MovieRecommendationItem(movie_id=item[0], rating=item[1]) for item in data
+    ]
 
 
-@app.post('/recommend')
-async def recommend(ratings: List[Ratings]):
-    ratings_dict = ratings_to_dict(ratings)
-    distances, similar_users = await movieRecommender.recommend(ratings_dict)
+@app.post('/retrain', tags=['ML'], summary='Retrains model with actual data')
+async def retrain():
+    movieRecommender.retrain()
     return {
-        'distances': distances,
-        'similar_users': similar_users
+        "status": 200
     }
+
+
+@app.get('/ping', tags=['Heath'], summary='Return pong if server is alive')
+async def ping():
+    return 'pong'

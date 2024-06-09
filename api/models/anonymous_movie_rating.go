@@ -1,6 +1,6 @@
 package models
 
 type AnonymousMovieRating struct {
-	MovieId int `json:"movie_id"`
-	Rating  int `json:"rating"`
+	MovieId int     `json:"movie_id"`
+	Rating  float64 `json:"rating"`
 }

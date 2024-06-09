@@ -12,6 +12,11 @@ type MoviePreview struct {
 	VoteAverage float32 `json:"voteAverage" db:"vote_average" example:"7.8"`
 }
 
+type MoviePreviewWithRating struct {
+	MoviePreview
+	Rating float32 `json:"rating" example:"4.5"`
+}
+
 type Movie struct {
 	Id               int
 	Budget           int64

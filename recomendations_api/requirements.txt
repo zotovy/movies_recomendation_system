@@ -4,3 +4,7 @@ numpy~=1.26.4
 scipy~=1.13.1
 scikit-learn~=1.5.0
 uvicorn~=0.30.1
+pandas~=2.2.2
+scikit-surprise~=1.1.4
+psycopg2~=2.9.9
+pydantic-settings~=2.3.1

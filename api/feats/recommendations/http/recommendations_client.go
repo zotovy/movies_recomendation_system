@@ -4,7 +4,6 @@ import (
 	"app/models"
 	"app/pkg/config"
 	"app/pkg/logger"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -20,15 +19,12 @@ func NewRecommendationsHttpClient(logger *logger.Logger, config *config.Config) 
 	return &RecommendationsHttpClient{logger: logger, config: config}
 }
 
-func (c *RecommendationsHttpClient) Recommend(ratings *[]models.AnonymousMovieRating) (*models.SimilarUsers, error) {
-	// Marshal ratings
-	jsonBody, _ := json.Marshal(ratings)
-
+func (c *RecommendationsHttpClient) Recommend(userId int, amount int) (*[]models.AnonymousMovieRating, error) {
 	// Build url
-	url := fmt.Sprintf("%s/recommend", c.config.Services.RecommendationsAPI.BaseUrl)
+	url := fmt.Sprintf("%s/recommend?user_id=%d&amount=%d", c.config.Services.RecommendationsAPI.BaseUrl, userId, amount)
 
 	// Do request
-	response, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBody))
+	response, err := http.Get(url)
 
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("Failed to invoke RecommendationsHttpClient.Recommend:\n%s", err.Error()))
@@ -44,12 +40,12 @@ func (c *RecommendationsHttpClient) Recommend(ratings *[]models.AnonymousMovieRa
 	}
 
 	// Unmarshal response body
-	var similarUsers *models.SimilarUsers
-	err = json.Unmarshal(body, &similarUsers)
+	var movieRatings *[]models.AnonymousMovieRating
+	err = json.Unmarshal(body, &movieRatings)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("Failed to invoke RecommendationsHttpClient.Recommend:\n%s", err.Error()))
 		return nil, err
 	}
 
-	return similarUsers, nil
+	return movieRatings, nil
 }

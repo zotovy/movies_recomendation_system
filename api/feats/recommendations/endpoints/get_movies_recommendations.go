@@ -1,11 +1,9 @@
 package endpoints
 
 import (
-	"app/models"
-	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
+	"strconv"
 )
 
 // @BasePath /api/v1
@@ -16,36 +14,35 @@ import (
 // @Tags         recommendations
 // @Accept  json
 // @Produce      json
-// @Param        request body []models.AnonymousMovieRating true "user ratings"
+// @Param        userId query int true "user id"
+// @Param        limit  query int false "query limit"
 // @Success      200 {array} models.MoviePreview
 // @Router       /recommendations/movies [post]
 func (c *Controller) GetMoviesRecommendations(ctx *gin.Context) {
-	jsonBody, err := io.ReadAll(ctx.Request.Body)
-
+	userIdStr := ctx.Query("userId")
+	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to parse request body",
+			"error": "Invalid user id",
 		})
-		return
 	}
 
-	var ratings *[]models.AnonymousMovieRating
-	err = json.Unmarshal(jsonBody, &ratings)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to marshal request body",
-		})
-		return
+	amountStr := ctx.Query("limit")
+	amount := 100
+	if amountStr != "" {
+		amount, err = strconv.Atoi(amountStr)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid user id",
+			})
+		}
 	}
 
-	if len(*ratings) == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Provide at least one movie rating",
-		})
-		return
+	if amount < 0 {
+		amount = 1
 	}
 
-	recommendations, err := c.repository.GetRecommendations(ratings)
+	recommendations, err := c.repository.GetRecommendations(userId, amount)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":    "Failed to get recommendations",

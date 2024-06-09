@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5"
 )
 
 type RecommendationRepository struct {
@@ -21,29 +20,29 @@ func NewRecommendationRepository(db *db.DB, logger *logger.Logger, recommendatio
 	return &RecommendationRepository{db: db, logger: logger, recommendationsHttpClient: recommendationsHttpClient}
 }
 
-func (r *RecommendationRepository) GetRecommendations(ratings *[]models.AnonymousMovieRating) (*[]models.MoviePreview, error) {
-	similarUsers, err := r.recommendationsHttpClient.Recommend(ratings)
+func (r *RecommendationRepository) GetRecommendations(userId int, amount int) (*[]models.MoviePreviewWithRating, error) {
+	ratings, err := r.recommendationsHttpClient.Recommend(userId, amount)
 	if err != nil {
 		return nil, err
 	}
 
-	// Extract movie ids
-	movieIds := make([]int, len(*ratings))
-	for i := range *ratings {
-		movieIds[i] = (*ratings)[i].MovieId
+	var values []interface{}
+	var placeholders string
+	for i, rating := range *ratings {
+		if i > 0 {
+			placeholders += ", "
+		}
+		placeholders += fmt.Sprintf("($%d::int, $%d::float)", 2*i+1, 2*i+2)
+		values = append(values, rating.MovieId, rating.Rating)
 	}
 
-	var movies []models.MoviePreview
+	var movies []models.MoviePreviewWithRating
 	err = pgxscan.Select(
 		context.Background(),
 		r.db,
 		&movies,
-		getRecommendationsSQL,
-		pgx.NamedArgs{
-			"userIds":   similarUsers.SimilarUsers,
-			"distances": similarUsers.Distances,
-			"movieIds":  movieIds,
-		},
+		fmt.Sprintf(getRecommendationsSQL, placeholders),
+		values...,
 	)
 
 	if err != nil {
@@ -55,39 +54,9 @@ func (r *RecommendationRepository) GetRecommendations(ratings *[]models.Anonymou
 }
 
 var getRecommendationsSQL = `
-WITH similar_users AS (
-    SELECT unnest(@userIds::int[]) AS user_id, unnest(@distances::float8[]) AS distance
-),
-     weighted_ratings AS (
-         SELECT
-             ur.movie_id,
-             SUM(ur.rating * (1 - su.distance)) AS weighted_sum,
-             SUM(1 - su.distance) AS total_distance
-         FROM ratings ur
-            JOIN similar_users su ON ur.user_id = su.user_id
-         GROUP BY
-             ur.movie_id
-     ),
-     predicted_ratings AS (
-         SELECT
-             m.id,
-             m.title,
-			 m.tagline,
-             m.vote_average,
-             wr.weighted_sum / wr.total_distance AS predicted_rating
-         FROM
-             movies m
-                 JOIN weighted_ratings wr ON m.id = wr.movie_id
-     )
-SELECT
-    id,
-    title,
-    tagline,
-	vote_average
-FROM
-    predicted_ratings
-WHERE id NOT IN(SELECT unnest(@movieIds::int[]))
-ORDER BY
-    predicted_rating DESC
-LIMIT 50;
+WITH ratings AS (
+SELECT * FROM (VALUES %s) AS temp (movie_id, rating))
+SELECT m.id, m.tagline, m.vote_average, m.title, r.rating
+FROM movies m
+JOIN ratings r ON m.id = r.movie_id;
 `

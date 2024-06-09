@@ -79,16 +79,17 @@ const docTemplate = `{
                 "summary": "Get movies recommendations",
                 "parameters": [
                     {
-                        "description": "user ratings",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AnonymousMovieRating"
-                            }
-                        }
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "userId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "query limit",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -170,17 +171,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.AnonymousMovieRating": {
-            "type": "object",
-            "properties": {
-                "movie_id": {
-                    "type": "integer"
-                },
-                "rating": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.CastDTO": {
             "type": "object",
             "properties": {

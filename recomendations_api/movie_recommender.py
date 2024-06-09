@@ -1,48 +1,47 @@
 import pickle
-import numpy as np
-import json
-from scipy.sparse import csr_matrix
+from surprise import Reader, Dataset, SVD
+from typing import List, Tuple, Optional
+
+from database import database
 
 
 class MovieRecommender:
     def __init__(self):
+        self._model: Optional[SVD] = None
         self.__load_model()
-        self.__load_movie_ratings()
-        self.num_movies = 45115
 
     def __load_model(self):
-        self._model = pickle.load(open('static/knn.pickle', 'rb'))
+        self._model = pickle.load(open('./static/svd_model.pkl', 'rb'))
 
-    def __load_movie_ratings(self):
-        with open('static/movie_to_index.json') as json_file:
-            self.movie_to_index = json.load(json_file)
+    def retrain(self):
+        # Грузим данные
+        ratings = database.get_all_ratings()
+        reader = Reader(line_format='user item rating', rating_scale=(1, 5))
+        data = Dataset.load_from_df(ratings, reader=reader)
 
-    def __create_new_row(self, movie_ratings):
-        """
-        Создает новую строку для разреженной матрицы на основе переданных рейтингов фильмов.
+        full_train_set = data.build_full_trainset()
 
-        :param movie_ratings: Словарь, где ключ - movieId, значение - рейтинг
-        :return: csr_matrix (разреженная матрица) с одной строкой
-        """
-        row = np.zeros(self.num_movies)
+        # Обучение модели с лучшими параметрами на обучающей выборке
+        model = SVD(n_epochs=35, lr_all=0.01, reg_all=0.1)
+        model.fit(full_train_set)
 
-        for movie_id, rating in movie_ratings.items():
-            if str(movie_id) in self.movie_to_index:
-                index = int(self.movie_to_index[str(movie_id)])
-                row[index] = rating
+        # Экспорт модели
+        with open('./static/svd_model.pkl', 'wb') as f:
+            pickle.dump(model, f)
 
-        return csr_matrix(row)
+        self._model = model
 
-    async def recommend(self, ratings):
+    def recommend(self, user_id: int) -> List[Tuple[int, float]]:
         """
         Выдает рекомендации по уже выставленным рекомендациям пользователя
 
-        :param ratings: Словарь, где ключ - movieId, значение - рейтинг
-        :return: distances, user_ids
+        :param user_id: id пользователя
+        :return: массив со значениями (movie_id, rating)
         """
-        user = self.__create_new_row(ratings)
-        distances, similar_users = self._model.kneighbors(user, n_neighbors=21)
-        return distances[0][1:].tolist(), similar_users[0][1:].tolist()
+        movies = database.get_movies_to_recommend(user_id)
+        predictions = [(movie_id[0], self._model.predict(user_id, movie_id[0]).est) for movie_id in movies]
+        top_movies = sorted(predictions, key=lambda x: x[1], reverse=True)
+        return top_movies
 
 
 movieRecommender = MovieRecommender()

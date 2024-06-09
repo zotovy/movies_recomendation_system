@@ -9,4 +9,6 @@ services:
       - '5566:8000'
     volumes:
       - ./static:/app/static
+    environment:
+      - database_host=postgres
 
